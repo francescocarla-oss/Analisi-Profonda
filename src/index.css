@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-cinzel: "Cinzel", serif;
+}
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@400;700&display=swap');
+  
+  body {
+    @apply bg-[#E4E3E0] text-[#141414] selection:bg-[#C5A059] selection:text-[#141414];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-[#C5A059]/30 hover:bg-[#C5A059]/50 transition-colors;
+}
+
+@keyframes gold-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(197, 160, 89, 0) 0%,
+    rgba(197, 160, 89, 0.2) 50%,
+    rgba(197, 160, 89, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: gold-shimmer 3s infinite linear;
+}
+
+.gold-glow {
+  box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+}
+
+.gold-glow-hover:hover {
+  box-shadow: 0 0 25px rgba(197, 160, 89, 0.5);
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+@keyframes logo-shine {
+  0% { filter: drop-shadow(0 0 10px rgba(197, 160, 89, 0.5)); }
+  50% { filter: drop-shadow(0 0 25px rgba(197, 160, 89, 0.8)) brightness(1.2); }
+  100% { filter: drop-shadow(0 0 10px rgba(197, 160, 89, 0.5)); }
+}
+
+.logo-shine:hover {
+  animation: logo-shine 2s infinite ease-in-out;
+}
