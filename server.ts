@@ -141,6 +141,7 @@ app.post('/api/analyze', async (req, res) => {
       config: {
         tools: [{ googleSearch: {} }],
         temperature: 0.1,
+        responseMimeType: "application/json",
       },
     });
     console.log("[Server] Risposta da Gemini API ricevuta!");
