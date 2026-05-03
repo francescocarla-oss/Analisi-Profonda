@@ -73,7 +73,7 @@ app.post('/api/analyze', async (req, res) => {
       1. Identifica l'azienda partendo dalla richiesta: "${ticker}". La richiesta può essere il NOME dell'azienda (es. "Saipem"), il TICKER senza suffisso (es. "SPM") o il TICKER con suffisso (es. "SPM.MI").
       2. Il tuo primo compito è identificare l'azienda corretta e la sua borsa valori principale.
       3. Se l'azienda NON ESISTE, NON È QUOTATA in Borsa, o se il nome si riferisce a un personaggio immaginario, un luogo di fantasia o un concetto astratto, NON DEVI inventare o associare l'analisi a un'altra azienda.
-      4. In caso di azienda inesistente o non quotata, restituisci un JSON con il campo "report" contenente esattamente la stringa: "AZIENDA_NON_ESISTENTE". NON FARE ASSOCIAZIONI CREATIVE.
+      4. In caso di azienda inesistente o non quotata, restituisci il tag [REPORT] contenente esattamente la stringa: "AZIENDA_NON_ESISTENTE". NON FARE ASSOCIAZIONI CREATIVE.
 
       REGOLE DI ANALISI:
       1. Per l'analisi fondamentale, usa come fonti gli annual reports ufficiali e i SEC files ufficiali (10-K, 10-Q, ecc.).
@@ -87,10 +87,10 @@ app.post('/api/analyze', async (req, res) => {
          - **IDENTIFICAZIONE PREZZO (CRITICO)**: Prendi il "Prezzo in tempo reale" (Real-time price) o l'ultimo prezzo visualizzato in caratteri grandi su Google Finance. Se il mercato è chiuso, usa il prezzo di "Chiusura" o "Post-market". 
          - **DIVIETO ASSOLUTO**: È TASSATIVAMENTE VIETATO usare "Target Price", "Prezzo Obiettivo", "Massimo a 52 settimane", "Minimo a 52 settimane" o valori medi di analisti come prezzo attuale. Se il dato che trovi è descritto come "Target" o "Obiettivo", SCARTALO e cerca il prezzo di scambio attuale.
          - **PRECISIONE E VERIFICA**: Il prezzo attuale DEVE essere quello esatto di scambio. Se Google Finance mostra $96.96 per eBay (EBAY), devi riportare esattamente $96.96. Un valore come $62.45 (che potrebbe essere un vecchio prezzo o un target) è un errore inaccettabile. Verifica il prezzo almeno due volte durante la ricerca per assicurarti che sia quello "Live" o di "Chiusura".
-         - **COERENZA VALUTA**: Assicurati che il simbolo della valuta nel JSON (currencySymbol) corrisponda alla valuta del prezzo trovato (es. "$" per USD, "€" per EUR).
+         - **COERENZA VALUTA**: Assicurati che il simbolo della valuta corrisponda alla valuta del prezzo trovato (es. "$" per USD, "€" per EUR).
          - **CAPITALIZZAZIONE DI MERCATO**: Prendi il dato della CAPITALIZZAZIONE DI MERCATO direttamente da Google Finance. Assicurati che sia aggiornato.
          - **P/E RATIO E DIVIDEND YIELD**: Prendi questi dati direttamente da Google Finance. Se non presenti, scrivi "N/A".
-         - **DOUBLE CHECK FINALE**: Prima di chiudere il JSON, fai un'ultima ricerca mentale/strumentale: "Il prezzo che ho inserito è il prezzo di scambio attuale o un target?". Se è un target, correggilo immediatamente.
+         - **DOUBLE CHECK FINALE**: Prima di restituire i dati, fai un'ultima ricerca mentale/strumentale: "Il prezzo che ho inserito è il prezzo di scambio attuale o un target?". Se è un target, correggilo immediatamente.
       4. Verifica sempre che ogni dato di mercato citato sia aggiornato alla data odierna (${currentDate}).
       5. Concentrati sulla lettera del CEO agli azionisti per capire la visione e l'onestà intellettuale.
       6. **REGOLE DI PRESENTAZIONE DATI FINANZIARI**:
@@ -105,7 +105,7 @@ app.post('/api/analyze', async (req, res) => {
       8. **DIVIETO ASSOLUTO DI DATI DI MERCATO NEL TESTO**: Il report markdown DEVE contenere esclusivamente analisi qualitativa. NON includere mai frasi come "Dati di mercato aggiornati al...", "Prezzo: ...", "Capitalizzazione: ...", ecc. Il mancato rispetto di questa regola renderà il report inutilizzabile.
       9. **DIVIETO DI INSIGHT CHIAVE**: È TASSATIVAMENTE VIETATO includere blocchi di riepilogo denominati "Insight chiave" o simili, sia all'inizio che all'interno del report. NON usare blocchi di citazione markdown (">") per riassumere l'analisi. Mantieni invece l'uso del grassetto all'interno dei paragrafi per enfatizzare nomi di prodotti, brand o concetti importanti.
       10. È TASSATIVAMENTE VIETATO includere una valutazione finale, un riepilogo conclusivo, un rating o qualsiasi giudizio di valore (es. "titolo core", "premio rispetto alla media", "margine di sicurezza"). L'analisi deve terminare bruscamente dopo la sezione RISCHI. Non usare mai intestazioni come "Conclusione", "Sintesi" o "Valutazione". Non dare consigli di investimento.
-      11. **DIVIETO DI VALUTAZIONE PREZZO**: È assolutamente vietato fornire qualsiasi genere di valutazione qualitativa del prezzo o del titolo (es. "il titolo riflette una valutazione che tiene conto di...", "prezzo equo", "sottovalutato"). Limitati a riportare i dati numerici puri e crudi (SOLO nel JSON, NON nel report).
+      11. **DIVIETO DI VALUTAZIONE PREZZO**: È assolutamente vietato fornire qualsiasi genere di valutazione qualitativa del prezzo o del titolo (es. "il titolo riflette una valutazione che tiene conto di...", "prezzo equo", "sottovalutato"). Limitati a riportare i dati numerici puri e crudi (SOLO nei campi strutturati, NON nel report).
       12. NON includere alcun titolo o intestazione all'inizio del report (es. "Analisi Approfondita: ..."). Il report deve iniziare direttamente con la prima sezione: COSA FA L'AZIENDA.
       
       LINGUA DEL REPORT:
@@ -115,23 +115,20 @@ app.post('/api/analyze', async (req, res) => {
       Usa un tono professionale, asciutto e diretto. 
       Limitati a circa 1500-2000 parole totali per l'intero report.
       
-      RITORNA I DATI IN FORMATO JSON con questa struttura:
-      {
-        "companyName": "Nome completo azienda",
-        "ticker": "TICKER_UFFICIALE",
-        "report": "Il report completo in markdown",
-        "currentPrice": 123.45,
-        "currencySymbol": "€",
-        "priceDate": "${currentDate}",
-        "peerTicker": "TICKER_CONCORRENTE"
-      }
+      RITORNA I DATI ESATTAMENTE CON LA SEGUENTE STRUTTURA A TAG (NON usare JSON):
       
-      Nota sul campo "ticker": Il valore deve essere ESCLUSIVAMENTE il ticker ufficiale dell'azienda (es. "CPR" per Campari, "AAPL" per Apple).
-      Nota sul campo "peerTicker": Identifica il principale concorrente diretto dell'azienda analizzata e inserisci il suo ticker ufficiale (es. se analizzi Coca-Cola (KO), il peerTicker potrebbe essere PEP). Se l'azienda è quotata a Milano, usa il suffisso .MI anche per il peer (es. se analizzi Eni (ENI.MI), il peerTicker potrebbe essere TEN.MI).
+      [COMPANY_NAME]Nome completo azienda[/COMPANY_NAME]
+      [TICKER]TICKER_UFFICIALE[/TICKER]
+      [CURRENT_PRICE]123.45[/CURRENT_PRICE]
+      [CURRENCY_SYMBOL]€[/CURRENCY_SYMBOL]
+      [PRICE_DATE]${currentDate}[/PRICE_DATE]
+      [PEER_TICKER]TICKER_CONCORRENTE[/PEER_TICKER]
+      [REPORT]
+      Il report completo in markdown
+      [/REPORT]
       
-      CRITICO PER IL FORMATO JSON: L'output DEVE essere un JSON sintatticamente perfetto.
-      1. Tutte le virgolette all'interno del testo markdown nel campo "report" DEVONO essere "escapate" con un backslash (es. \\").
-      2. Tutti i ritorni a capo nel campo "report" DEVONO essere scritti letteralmente come \\n. NON INSERIRE VERE INTERRUZIONI DI RIGA (newlines fisici) all'interno delle stringhe JSON. La stringa del report deve essere su una sola riga nel JSON.
+      Nota sul campo "TICKER": Il valore deve essere ESCLUSIVAMENTE il ticker ufficiale dell'azienda (es. "CPR" per Campari, "AAPL" per Apple).
+      Nota sul campo "PEER_TICKER": Identifica il principale concorrente diretto dell'azienda analizzata e inserisci il suo ticker ufficiale (es. se analizzi Coca-Cola (KO), il peerTicker potrebbe essere PEP). Se l'azienda è quotata a Milano, usa il suffisso .MI anche per il peer (es. se analizzi Eni (ENI.MI), il peerTicker potrebbe essere TEN.MI).
     `;
 
     console.log("[Server] Chiamata a Gemini API iniziata...");
@@ -141,7 +138,6 @@ app.post('/api/analyze', async (req, res) => {
       config: {
         tools: [{ googleSearch: {} }],
         temperature: 0.1,
-        responseMimeType: "application/json",
       },
     });
     console.log("[Server] Risposta da Gemini API ricevuta!");
@@ -151,30 +147,32 @@ app.post('/api/analyze', async (req, res) => {
     }
 
     let rawText = response.text.trim();
-    if (rawText.startsWith('```json')) {
-      rawText = rawText.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
-    } else if (rawText.startsWith('```')) {
-      rawText = rawText.replace(/^```\s*/, '').replace(/```$/, '').trim();
-    }
+    
+    const extractTag = (tag: string) => {
+      const regex = new RegExp(`\\[${tag}\\]([\\s\\S]*?)\\[\\/${tag}\\]`, 'i');
+      const match = rawText.match(regex);
+      return match ? match[1].trim() : null;
+    };
 
-    let result;
-    try {
-      result = JSON.parse(rawText);
-    } catch (parseError) {
-      try {
-        const sanitized = rawText.replace(/(?<!\\)\n/g, '\\n')
-                                 .replace(/\\n\s*}/g, '\n}')
-                                 .replace(/{\s*\\n/g, '{\n')
-                                 .replace(/,\s*\\n/g, ',\n')
-                                 .replace(/\\n\s*,/g, '\n,')
-                                 .replace(/\[\s*\\n/g, '[\n')
-                                 .replace(/\\n\s*\]/g, '\n]')
-                                 .replace(/":\s*\\n/g, '":\n');
-        result = JSON.parse(sanitized);
-      } catch (e2) {
-        console.error("[Server] JSON Parse Error. Raw Text was:\n", rawText);
-        throw new Error("Errore nella formattazione dei dati (JSON non valido). L'IA ha restituito un formato errato. Riprova l'analisi.");
-      }
+    let result: any = {};
+    const reportText = extractTag('REPORT');
+
+    if (reportText === "AZIENDA_NON_ESISTENTE" || !reportText || reportText.length < 50) {
+      result.report = reportText || "AZIENDA_NON_ESISTENTE";
+    } else {
+      let priceVal = extractTag('CURRENT_PRICE') || "0";
+      // Pulizia base del prezzo se arriva sporco
+      priceVal = priceVal.replace(/[^0-9.,-]/g, '').replace(',', '.');
+      
+      result = {
+        companyName: extractTag('COMPANY_NAME') || "",
+        ticker: extractTag('TICKER') || "",
+        currentPrice: parseFloat(priceVal) || 0,
+        currencySymbol: extractTag('CURRENCY_SYMBOL') || "",
+        priceDate: extractTag('PRICE_DATE') || currentDate,
+        peerTicker: extractTag('PEER_TICKER') || "",
+        report: reportText
+      };
     }
     
     // Check for explicit "not found" signal from prompt
