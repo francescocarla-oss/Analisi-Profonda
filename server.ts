@@ -132,29 +132,33 @@ app.post('/api/analyze', async (req, res) => {
     `;
 
     let response: any;
-    let retries = 3;
+    let attempt = 0;
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
     let delay = 2000;
 
-    while (retries > 0) {
+    while (attempt < modelsToTry.length) {
+      const currentModel = modelsToTry[attempt];
       try {
-        console.log(`[Server] Chiamata a Gemini API iniziata... (Tentativi rimasti: ${retries})`);
+        console.log(`[Server] Tentativo ${attempt + 1}/${modelsToTry.length} con modello: ${currentModel}`);
         response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: currentModel,
           contents: prompt,
           config: {
             tools: [{ googleSearch: {} }],
             temperature: 0.1,
           },
         });
-        console.log("[Server] Risposta da Gemini API ricevuta!");
+        console.log(`[Server] Risultato ottenuto con successo usando ${currentModel}!`);
         break;
       } catch (err: any) {
-        console.error(`[Server] Errore Gemini API (Tentativi rimasti: ${retries - 1}):`, err.message);
-        retries--;
-        if (retries === 0) throw err;
-        console.log(`[Server] Attendo ${delay}ms prima di riprovare...`);
+        console.error(`[Server] Errore con ${currentModel}:`, err.message);
+        attempt++;
+        if (attempt >= modelsToTry.length) {
+          throw err;
+        }
+        console.log(`[Server] Attendo ${delay}ms prima di passare al prossimo tentativo...`);
         await new Promise(resolve => setTimeout(resolve, delay));
-        delay *= 2;
+        delay *= 1.5;
       }
     }
 
