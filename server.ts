@@ -135,10 +135,9 @@ app.post('/api/analyze', async (req, res) => {
     let attempt = 0;
     const modelsToTry = [
       "gemini-2.5-flash",
-      "gemini-2.5-flash",
       "gemini-1.5-flash"
     ];
-    let delay = 5000;
+    let delay = 1000; // Solo 1 secondo di attesa tra i modelli
 
     while (attempt < modelsToTry.length) {
       const currentModel = modelsToTry[attempt];
@@ -160,9 +159,8 @@ app.post('/api/analyze', async (req, res) => {
         if (attempt >= modelsToTry.length) {
           throw err;
         }
-        console.log(`[Server] Attendo ${delay/1000} secondi e passo al prossimo tentativo...`);
+        console.log(`[Server] Passo immediatamente al modello di backup ${modelsToTry[attempt]}...`);
         await new Promise(resolve => setTimeout(resolve, delay));
-        delay += 2000; // Il prossimo ritardo sarà 7s
       }
     }
 
