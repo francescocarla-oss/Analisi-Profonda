@@ -135,12 +135,9 @@ app.post('/api/analyze', async (req, res) => {
     let attempt = 0;
     const modelsToTry = [
       "gemini-2.5-flash",
-      "gemini-2.0-flash",
-      "gemini-2.5-flash",
-      "gemini-2.0-flash",
-      "gemini-2.5-flash"
+      "gemini-2.0-flash"
     ];
-    let delay = 5000; // Inizia con 5 secondi di attesa
+    let delay = 3000; // Unica attesa di 3 secondi
 
     while (attempt < modelsToTry.length) {
       const currentModel = modelsToTry[attempt];
@@ -162,9 +159,8 @@ app.post('/api/analyze', async (req, res) => {
         if (attempt >= modelsToTry.length) {
           throw err;
         }
-        console.log(`[Server] Server Google occupato. Attendo ${delay/1000} secondi prima del prossimo tentativo...`);
+        console.log(`[Server] Server Google occupato. Attendo ${delay/1000} secondi e passo a ${modelsToTry[attempt]}...`);
         await new Promise(resolve => setTimeout(resolve, delay));
-        delay += 5000; // Aumenta di 5s ogni volta (5, 10, 15, 20) per un totale di ~50s di backoff
       }
     }
 
