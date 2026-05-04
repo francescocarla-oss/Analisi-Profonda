@@ -131,16 +131,32 @@ app.post('/api/analyze', async (req, res) => {
       Nota sul campo "PEER_TICKER": Identifica il principale concorrente diretto dell'azienda analizzata e inserisci il suo ticker ufficiale (es. se analizzi Coca-Cola (KO), il peerTicker potrebbe essere PEP). Se l'azienda è quotata a Milano, usa il suffisso .MI anche per il peer (es. se analizzi Eni (ENI.MI), il peerTicker potrebbe essere TEN.MI).
     `;
 
-    console.log("[Server] Chiamata a Gemini API iniziata...");
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        temperature: 0.1,
-      },
-    });
-    console.log("[Server] Risposta da Gemini API ricevuta!");
+    let response: any;
+    let retries = 3;
+    let delay = 2000;
+
+    while (retries > 0) {
+      try {
+        console.log(`[Server] Chiamata a Gemini API iniziata... (Tentativi rimasti: ${retries})`);
+        response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: {
+            tools: [{ googleSearch: {} }],
+            temperature: 0.1,
+          },
+        });
+        console.log("[Server] Risposta da Gemini API ricevuta!");
+        break;
+      } catch (err: any) {
+        console.error(`[Server] Errore Gemini API (Tentativi rimasti: ${retries - 1}):`, err.message);
+        retries--;
+        if (retries === 0) throw err;
+        console.log(`[Server] Attendo ${delay}ms prima di riprovare...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+    }
 
     if (!response.text) {
       throw new Error("L'analisi non è possibile per questa azienda. Prova con un'altra.");
