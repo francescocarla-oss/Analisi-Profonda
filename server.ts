@@ -57,6 +57,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString(), hasKey: !!process.env.GEMINI_API_KEY });
 });
 
+app.get('/api/models', async (req, res) => {
+  try {
+    const ai = getGeminiClient();
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + process.env.GEMINI_API_KEY);
+    const data = await response.json();
+    res.json({ models: data.models?.map((m: any) => m.name) || [] });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/analyze', async (req, res) => {
   const { ticker, language } = req.body;
   if (!ticker) return res.status(400).json({ error: 'Ticker mancante' });
