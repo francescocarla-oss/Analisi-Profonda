@@ -133,33 +133,29 @@ app.post('/api/analyze', async (req, res) => {
 
     let response: any;
     let attempt = 0;
-    const modelsToTry = [
-      "gemini-2.5-flash",
-      "gemini-1.5-flash"
-    ];
-    let delay = 1000; // Solo 1 secondo di attesa tra i modelli
+    const maxAttempts = 2; // Massimo 2 tentativi in totale per non sforare i 100s di Render
+    let delay = 2000;
 
-    while (attempt < modelsToTry.length) {
-      const currentModel = modelsToTry[attempt];
+    while (attempt < maxAttempts) {
       try {
-        console.log(`[Server] Tentativo ${attempt + 1}/${modelsToTry.length} con modello: ${currentModel}`);
+        console.log(`[Server] Tentativo ${attempt + 1}/${maxAttempts} con modello: gemini-2.5-flash`);
         response = await ai.models.generateContent({
-          model: currentModel,
+          model: "gemini-2.5-flash",
           contents: prompt,
           config: {
             tools: [{ googleSearch: {} }],
             temperature: 0.1,
           },
         });
-        console.log(`[Server] Risultato ottenuto con successo usando ${currentModel}!`);
+        console.log(`[Server] Risultato ottenuto con successo!`);
         break;
       } catch (err: any) {
-        console.error(`[Server] Errore con ${currentModel}:`, err.message);
+        console.error(`[Server] Errore API:`, err.message);
         attempt++;
-        if (attempt >= modelsToTry.length) {
+        if (attempt >= maxAttempts) {
           throw err;
         }
-        console.log(`[Server] Passo immediatamente al modello di backup ${modelsToTry[attempt]}...`);
+        console.log(`[Server] Attendo ${delay/1000} secondi prima del ritentativo...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
