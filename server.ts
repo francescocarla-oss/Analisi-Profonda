@@ -144,8 +144,13 @@ app.post('/api/analyze', async (req, res) => {
 
     let response: any;
     let attempt = 0;
-    const maxAttempts = 2; // Massimo 2 tentativi in totale
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro"]; // Il Pro è disponibile nel piano a pagamento
+    const modelsToTry = [
+      "gemini-2.5-flash", 
+      "gemini-2.5-pro", 
+      "gemini-flash-latest", 
+      "gemini-3-flash-preview"
+    ];
+    const maxAttempts = modelsToTry.length;
     let delay = 2000;
 
     while (attempt < maxAttempts) {
