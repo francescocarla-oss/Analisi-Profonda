@@ -465,7 +465,7 @@ export default function App() {
                     </form>
 
                     <p className="text-lg md:text-xl leading-relaxed font-serif italic text-[#141414]/90">
-                      <span className="text-[#C5A059] font-bold not-italic drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">Francesco & Lodovico Carlà</span>{t.heroFooter1}<a href="https://www.finanzaworld.it" target="_blank" rel="noopener noreferrer" className="text-[#C5A059] font-bold not-italic hover:underline decoration-[#C5A059]/40">FinanzaWorld</a>{t.heroFooter2}
+                      {t.heroFooter1}<span className="text-[#C5A059] font-bold not-italic drop-shadow-[0_1px_1px_rgba(0,0,0,0.1)]">Francesco Carlà</span>{t.heroFooter2}<a href="https://www.finanzaworld.it" target="_blank" rel="noopener noreferrer" className="text-[#C5A059] font-bold not-italic hover:underline decoration-[#C5A059]/40">FinanzaWorld</a>{t.heroFooter3}<a href="mailto:premium@finanzaworld.it" className="text-[#C5A059] font-bold not-italic hover:underline decoration-[#C5A059]/40">premium@finanzaworld.it</a>
                     </p>
                   </div>
                 </div>
